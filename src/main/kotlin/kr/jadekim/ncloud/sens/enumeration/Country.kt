@@ -5,6 +5,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 
 enum class Country(val code: Int) {
+    KOREA(82),
     USA(1),
     CANADA(1),
     TAIWAN(886),

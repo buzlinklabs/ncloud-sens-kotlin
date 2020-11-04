@@ -4,7 +4,7 @@ import com.github.kittinunf.fuel.core.Request
 
 class ApiKeyAuthenticator(private val apiKey: String) : Authenticator(ApiKeyAuthenticator) {
 
-    companion object : AuthenticatorTag {
+    companion object : AuthenticatorMeta {
 
         override val name: String = "API-KEY"
     }
@@ -14,4 +14,4 @@ class ApiKeyAuthenticator(private val apiKey: String) : Authenticator(ApiKeyAuth
     }
 }
 
-fun Request.apiKey() = tag(ApiKeyAuthenticator)
+fun Request.apiKey() = ApiKeyAuthenticator.asTag().attach(this)

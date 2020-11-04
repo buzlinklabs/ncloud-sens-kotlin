@@ -8,7 +8,7 @@ class ApiKeyIamAuthenticator(
     secretKey: String
 ) : Authenticator(ApiKeyIamAuthenticator) {
 
-    companion object : AuthenticatorTag {
+    companion object : AuthenticatorMeta {
 
         override val name: String = "API-KEY_IAM"
     }
@@ -22,4 +22,4 @@ class ApiKeyIamAuthenticator(
     }
 }
 
-fun Request.apiKeyIam() = tag(ApiKeyIamAuthenticator)
+fun Request.apiKeyIam() = ApiKeyIamAuthenticator.asTag().attach(this)

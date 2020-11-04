@@ -10,7 +10,7 @@ class IamAuthenticator(
     private val secretKey: String
 ) : Authenticator(IamAuthenticator) {
 
-    companion object : AuthenticatorTag {
+    companion object : AuthenticatorMeta {
 
         override val name: String = "IAM"
     }
@@ -27,7 +27,10 @@ class IamAuthenticator(
         val plainSignature = buildString {
             append(method.value)
             append(" ")
-            append(uri.rawPath + uri.rawQuery?.let { "?$it" })
+            append(uri.rawPath)
+            uri.rawQuery?.let {
+                append("?$it")
+            }
             appendLine()
             append(timestamp)
             appendLine()
@@ -48,4 +51,4 @@ class IamAuthenticator(
     }
 }
 
-fun Request.iam() = tag(IamAuthenticator)
+fun Request.iam() = IamAuthenticator.asTag().attach(this)

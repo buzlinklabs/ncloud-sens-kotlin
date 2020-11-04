@@ -9,7 +9,7 @@ plugins {
 
 val artifactName = "ncloud-sens-kotlin"
 val artifactGroup = "kr.jadekim"
-val artifactVersion = "0.0.1"
+val artifactVersion = "0.0.9"
 group = artifactGroup
 version = artifactVersion
 
@@ -22,7 +22,7 @@ dependencies {
     val fuelVersion: String by project
     val gsonVersion: String by project
 
-    implementation("com.github.kittinunf.fuel:fuel:$fuelVersion")
+    api("com.github.kittinunf.fuel:fuel:$fuelVersion")
     implementation("com.github.kittinunf.fuel:fuel-coroutines:$fuelVersion")
     implementation("com.github.kittinunf.fuel:fuel-gson:$fuelVersion")
     implementation("com.google.code.gson:gson:$gsonVersion")

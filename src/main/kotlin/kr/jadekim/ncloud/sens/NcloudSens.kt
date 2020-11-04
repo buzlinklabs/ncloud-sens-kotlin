@@ -4,6 +4,7 @@ import com.github.kittinunf.fuel.core.await
 import com.github.kittinunf.fuel.core.awaitUnit
 import com.github.kittinunf.fuel.gson.gsonDeserializer
 import com.github.kittinunf.fuel.gson.jsonBody
+import com.google.gson.ExclusionStrategy
 import com.google.gson.GsonBuilder
 import kr.jadekim.ncloud.Ncloud
 import kr.jadekim.ncloud.NcloudClientFactory
@@ -11,29 +12,32 @@ import kr.jadekim.ncloud.authenticator.iam
 import kr.jadekim.ncloud.sens.enumeration.Country
 import kr.jadekim.ncloud.sens.enumeration.SmsContentType
 import kr.jadekim.ncloud.sens.enumeration.SmsType
-import kr.jadekim.ncloud.sens.protocol.GetSendSmsRequest
-import kr.jadekim.ncloud.sens.protocol.GetSendSmsResult
-import kr.jadekim.ncloud.sens.protocol.GetSmsReservationStatus
-import kr.jadekim.ncloud.sens.protocol.SendSms
+import kr.jadekim.ncloud.sens.protocol.*
 
-class NCloudSens(clientFactory: NcloudClientFactory, serviceId: String) {
+class NcloudSens(clientFactory: NcloudClientFactory, serviceId: String) {
 
-    private val fuel = clientFactory.create {
-        basePath = "https://sens.apigw.ntruss.com/sms/v2/services/$serviceId"
-
-        addRequestInterceptor { next ->
-            {
-                it.iam()
-                next(it)
-            }
-        }
+    companion object {
+        const val MAX_BULK_SEND_SIZE = 1000
     }
 
+    private val fuel = clientFactory.create(
+        {
+            basePath = "https://sens.apigw.ntruss.com/sms/v2/services/$serviceId"
+
+            addRequestInterceptor { next ->
+                {
+                    it.iam()
+                    next(it)
+                }
+            }
+        }
+    )
+
     private val gson = GsonBuilder()
-        .excludeFieldsWithoutExposeAnnotation()
         .registerTypeAdapter(SmsType::class.java, SmsType.GsonAdapter)
         .registerTypeAdapter(SmsContentType::class.java, SmsContentType.GsonAdapter)
         .registerTypeAdapter(Country::class.java, Country.GsonAdapter)
+        .registerTypeAdapter(EmmaResultCode::class.java, EmmaResultCode.GsonAdapter)
         .create()
 
     suspend fun sendSms(message: SendSms.Request): SendSms.Response =
@@ -64,4 +68,4 @@ class NCloudSens(clientFactory: NcloudClientFactory, serviceId: String) {
     }
 }
 
-fun Ncloud.sens(serviceId: String) = NCloudSens(clientFactory, serviceId)
+fun Ncloud.sens(serviceId: String) = NcloudSens(clientFactory, serviceId)

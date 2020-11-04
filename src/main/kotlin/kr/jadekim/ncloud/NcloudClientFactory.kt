@@ -7,12 +7,17 @@ import kr.jadekim.ncloud.authenticator.ApiKeyIamAuthenticator
 import kr.jadekim.ncloud.authenticator.IamAuthenticator
 import kr.jadekim.ncloud.credentials.Credentials
 
-class NcloudClientFactory (
+class NcloudClientFactory(
     private val credentials: Credentials,
-    private val globalConfigureClient: FuelManager.() -> Unit = {}
+    private val globalConfiguration: FuelManager.() -> Unit = {}
 ) {
 
-    fun create(configure: FuelManager.() -> Unit = {}): RequestFactory.Convenience = FuelManager().apply {
+    fun create(
+        preConfigure: FuelManager.() -> Unit = {},
+        postConfiguration: FuelManager.() -> Unit = {}
+    ): RequestFactory.Convenience = FuelManager().apply {
+        preConfigure()
+
         if (!credentials.apiKey.isNullOrBlank()) {
             addRequestInterceptor(ApiKeyAuthenticator(credentials.apiKey))
         }
@@ -34,7 +39,7 @@ class NcloudClientFactory (
             )
         }
 
-        globalConfigureClient()
-        configure()
+        globalConfiguration()
+        postConfiguration()
     }
 }

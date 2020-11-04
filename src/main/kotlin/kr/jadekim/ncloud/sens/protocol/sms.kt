@@ -1,9 +1,14 @@
 package kr.jadekim.ncloud.sens.protocol
 
 import com.github.kittinunf.fuel.util.encodeBase64
-import com.google.gson.annotations.Expose
+import com.google.gson.TypeAdapter
 import com.google.gson.annotations.SerializedName
-import kr.jadekim.ncloud.sens.enumeration.*
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
+import kr.jadekim.ncloud.sens.enumeration.Country
+import kr.jadekim.ncloud.sens.enumeration.SmsContentType
+import kr.jadekim.ncloud.sens.enumeration.SmsReserveStatus
+import kr.jadekim.ncloud.sens.enumeration.SmsType
 
 class SendSms {
     data class Request(
@@ -96,12 +101,12 @@ class GetSmsReservationStatus {
     )
 }
 
-class EmmaResultCode(@Expose val code: String) {
+class EmmaResultCode(val code: String) {
 
     val isSuccess = code == "0"
 
     val description by lazy {
-        when(code) {
+        when (code) {
             //IB G/W Report Code : 이통사 전송 후 받은 결과코드
             "0" -> "성공"
             "2000" -> "전송 시간 초과"
@@ -184,5 +189,14 @@ class EmmaResultCode(@Expose val code: String) {
             "E999" -> "기타 오류"
             else -> "알 수 없는 오류"
         }
+    }
+
+    object GsonAdapter : TypeAdapter<EmmaResultCode>() {
+
+        override fun write(out: JsonWriter, value: EmmaResultCode?) {
+            out.value(value?.code)
+        }
+
+        override fun read(input: JsonReader): EmmaResultCode = EmmaResultCode(input.nextString())
     }
 }
